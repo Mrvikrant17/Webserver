@@ -1,0 +1,8 @@
+services:
+  postgres:
+    image: postgres:16
+    environment: { POSTGRES_DB: jobs, POSTGRES_USER: jobs, POSTGRES_PASSWORD: jobs }
+    ports: ["5432:5432"]
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    ports: ["5672:5672", "15672:15672"]   # UI: http://localhost:15672 (guest/guest)

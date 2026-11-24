@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: job-platform
+  datasource:
+    url: jdbc:postgresql://localhost:5432/jobs
+    username: jobs
+    password: jobs
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    publisher-confirm-type: correlated   # relay waits for broker confirms
+    listener:
+      simple:
+        acknowledge-mode: manual         # we ack only after the DB commit
+        prefetch: 5
+        concurrency: 2
+        max-concurrency: 4
+        default-requeue-rejected: false  # rejected/poison messages go to the DLQ
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus
+
+logging:
+  structured:
+    format:
+      console: logstash   # JSON logs, MDC (jobId, attempt, workerId) included
+                          # remove this block for human-readable local logs
+
+app:
+  worker:
+    enabled: true
+    lease-seconds: 60
+  relay:
+    enabled: true
+    poll-interval-ms: 500
+    batch-size: 100
+  reaper:
+    enabled: true
+    interval-ms: 10000
+  retry:
+    base-delay-ms: 2000
+    max-delay-ms: 300000
+    jitter: 0.2
